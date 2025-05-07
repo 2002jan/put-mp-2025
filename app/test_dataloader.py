@@ -1,9 +1,11 @@
 import matplotlib.pyplot as plt
 from torchvision import transforms
-
+from utils.env import Env
 from utils.dataset import DepthDataset, create_data_loader
 
 if __name__ == "__main__":
+    env = Env()
+    
     image_size = 256
     transform = transforms.Compose([
         transforms.Resize((image_size, image_size)),
@@ -18,7 +20,7 @@ if __name__ == "__main__":
     ])
 
     dataset = DepthDataset(
-        root_dir="F:\\kitti\\data\\val",
+        root_dir=env.dataset_path / "val",
         transform=transform,
         target_transform=target_transform,
     )
