@@ -1,9 +1,8 @@
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from tqdm import tqdm
-
+import matplotlib.pyplot as plt
 
 class SILogLoss(nn.Module):
     """
@@ -90,10 +89,38 @@ def evaluate(model, dataloader, loss_fn, device):
 def train_model(model, train_loader, val_loader, num_epochs=10, lr=1e-4, device='cuda'):
     model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    loss_fn = BerHuLoss() 
+    loss_fn = BerHuLoss()
+
+    train_losses = []
+    val_losses = []
 
     for epoch in range(1, num_epochs + 1):
         print(f"Epoch {epoch}/{num_epochs}")
         train_loss = train_one_epoch(model, train_loader, optimizer, loss_fn, device)
         val_loss = evaluate(model, val_loader, loss_fn, device)
-        print(f"Train SILog Loss: {train_loss:.4f} | Val SILog Loss: {val_loss:.4f}")
+
+        train_losses.append(train_loss)
+        val_losses.append(val_loss)
+
+        print(f"Train Loss: {train_loss} | Val Loss: {val_loss}")
+
+    # write losses to file separate by comma
+    with open('train_losses.txt', 'w') as f:
+        for i in range(num_epochs):
+            f.write(f"{train_losses[i]},")   
+        
+    with open('val_losses.txt', 'w') as f:
+        for i in range(num_epochs):
+            f.write(f"{val_losses[i]},")
+    # write losses to file separate by comma
+
+    # Plotting the training and validation losses
+    plt.figure(figsize=(10, 5))
+    plt.plot(range(1, num_epochs + 1), train_losses, label='Train Loss')
+    plt.plot(range(1, num_epochs + 1), val_losses, label='Val Loss')
+    plt.xlabel('Epoch')
+    plt.ylabel('Reverse huber Loss')
+    plt.title('Training Progress')
+    plt.legend()
+    plt.grid(True)
+    plt.show()
