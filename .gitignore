@@ -4,3 +4,5 @@
 .idea
 __pycache__
 /dataset
+*.pth
+*.txt
