@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -13,12 +14,26 @@ class SILogLoss(nn.Module):
         self.variance_focus = variance_focus
 
     def forward(self, pred, target):
-        mask = target > 0  # valid depth mask
-        pred = pred[mask]
-        target = target[mask]
-        log_diff = torch.log(pred) - torch.log(target)
-        silog = torch.mean(log_diff ** 2) - self.variance_focus * torch.mean(log_diff) ** 2
-        return silog
+        pred = pred.reshape(-1)
+        target = target.reshape(-1)
+
+        mask = target > 0
+        masked_pred = pred[mask]
+        masked_target = target[mask]
+
+        log_diff = torch.log(masked_pred) - torch.log(masked_target)
+
+        silog1 = torch.mean(log_diff ** 2)
+        silog2 = torch.mean(log_diff) ** 2
+        return silog1 - silog2
+
+
+        # mask = target > 0  # valid depth mask
+        # pred = pred[mask]
+        # target = target[mask]
+        # log_diff = torch.log(pred) - torch.log(target)
+        # silog = torch.mean(log_diff ** 2) - self.variance_focus * torch.mean(log_diff) ** 2
+        # return silog
 
 class BerHuLoss(nn.Module):
     """
@@ -89,7 +104,9 @@ def evaluate(model, dataloader, loss_fn, device):
 def train_model(model, train_loader, val_loader, num_epochs=10, lr=1e-4, device='cuda'):
     model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    loss_fn = BerHuLoss()
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=6, verbose=True)
+
+    loss_fn = SILogLoss()
 
     train_losses = []
     val_losses = []
@@ -98,6 +115,8 @@ def train_model(model, train_loader, val_loader, num_epochs=10, lr=1e-4, device=
         print(f"Epoch {epoch}/{num_epochs}")
         train_loss = train_one_epoch(model, train_loader, optimizer, loss_fn, device)
         val_loss = evaluate(model, val_loader, loss_fn, device)
+
+        scheduler.step(val_loss)
 
         train_losses.append(train_loss)
         val_losses.append(val_loss)

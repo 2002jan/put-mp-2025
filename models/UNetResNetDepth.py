@@ -26,7 +26,10 @@ class UNetResNetDepth(nn.Module):
         self.upconv1 = self._upsample(64, 32)
         self.iconv1 = self._conv_block(96, 32)
 
-        self.outconv = nn.Conv2d(32, 1, kernel_size=1)
+        self.outconv = nn.Sequential(
+            nn.Conv2d(32, 1, kernel_size=1),
+            nn.Softplus()
+        )
 
     def _upsample(self, in_ch, out_ch):
         return nn.ConvTranspose2d(in_ch, out_ch, kernel_size=2, stride=2)
