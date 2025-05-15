@@ -14,26 +14,25 @@ class SILogLoss(nn.Module):
         self.variance_focus = variance_focus
 
     def forward(self, pred, target):
-        pred = pred.reshape(-1)
-        target = target.reshape(-1)
+        # pred = pred.reshape(-1)
+        # target = target.reshape(-1)
+        #
+        # mask = target > 0
+        # masked_pred = pred[mask]
+        # masked_target = target[mask]
+        #
+        # log_diff = torch.log(masked_pred) - torch.log(masked_target)
+        #
+        # silog1 = torch.mean(log_diff ** 2)
+        # silog2 = torch.mean(log_diff) ** 2
+        # return silog1 - silog2
 
-        mask = target > 0
-        masked_pred = pred[mask]
-        masked_target = target[mask]
-
-        log_diff = torch.log(masked_pred) - torch.log(masked_target)
-
-        silog1 = torch.mean(log_diff ** 2)
-        silog2 = torch.mean(log_diff) ** 2
-        return silog1 - silog2
-
-
-        # mask = target > 0  # valid depth mask
-        # pred = pred[mask]
-        # target = target[mask]
-        # log_diff = torch.log(pred) - torch.log(target)
-        # silog = torch.mean(log_diff ** 2) - self.variance_focus * torch.mean(log_diff) ** 2
-        # return silog
+        mask = target > 0  # valid depth mask
+        pred = pred[mask]
+        target = target[mask]
+        log_diff = torch.log(pred) - torch.log(target)
+        silog = torch.mean(log_diff ** 2) - self.variance_focus * torch.mean(log_diff) ** 2
+        return silog
 
 class BerHuLoss(nn.Module):
     """
