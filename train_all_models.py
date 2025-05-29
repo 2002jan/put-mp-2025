@@ -115,7 +115,7 @@ def train_model(name: str, env: Env, train_ds: DepthDataset, val_ds: DepthDatase
     train_loader = create_data_loader(train_ds, batch_size=bs)
     val_loader = create_data_loader(val_ds, batch_size=bs, shuffle=False)
 
-    num_epochs = 1
+    num_epochs = 400
 
     for epoch in range(1, num_epochs + 1):
         print(f"Epoch {epoch}/{num_epochs}")
