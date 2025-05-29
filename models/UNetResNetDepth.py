@@ -2,16 +2,17 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 
+
 class UNetResNetDepth(nn.Module):
     def __init__(self):
         super(UNetResNetDepth, self).__init__()
         resnet = models.resnet34(pretrained=True)
         # Encoder layers
-        self.enc1 = nn.Sequential(resnet.conv1, resnet.bn1, resnet.relu)   
-        self.enc2 = nn.Sequential(resnet.maxpool, resnet.layer1)           
-        self.enc3 = resnet.layer2                                          
-        self.enc4 = resnet.layer3                                          
-        self.enc5 = resnet.layer4                                          
+        self.enc1 = nn.Sequential(resnet.conv1, resnet.bn1, resnet.relu)
+        self.enc2 = nn.Sequential(resnet.maxpool, resnet.layer1)
+        self.enc3 = resnet.layer2
+        self.enc4 = resnet.layer3
+        self.enc5 = resnet.layer4
 
         # Decoder layers
         self.upconv4 = self._upsample(512, 256)

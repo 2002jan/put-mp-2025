@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from torch.nn import MSELoss
 from torch.optim.lr_scheduler import ReduceLROnPlateau
 from tqdm import tqdm
 import matplotlib.pyplot as plt
@@ -9,7 +10,7 @@ class SILogLoss(nn.Module):
     """
     Scale-Invariant Logarithmic Loss for depth estimation.
     """
-    def __init__(self, variance_focus=0.85):
+    def __init__(self, variance_focus=0.5):
         super().__init__()
         self.variance_focus = variance_focus
 
@@ -30,8 +31,8 @@ class SILogLoss(nn.Module):
         mask = target > 0  # valid depth mask
         pred = pred[mask]
         target = target[mask]
-        log_diff = torch.log(pred) - torch.log(target)
-        silog = torch.mean(log_diff ** 2) - self.variance_focus * torch.mean(log_diff) ** 2
+        log_diff = torch.log(target) - torch.log(pred)
+        silog = torch.mean(torch.pow(log_diff, 2)) - self.variance_focus * torch.pow(torch.mean(log_diff), 2)
         return silog
 
 class BerHuLoss(nn.Module):
@@ -100,7 +101,7 @@ def evaluate(model, dataloader, loss_fn, device):
     return total_loss / len(dataloader.dataset)
 
 
-def train_model(model, train_loader, val_loader, num_epochs=10, lr=1e-4, device='cuda'):
+def train_model(model, train_loader, val_loader, num_epochs=10, lr=1e-3, device='cuda'):
     model = model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=lr)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=6, verbose=True)
