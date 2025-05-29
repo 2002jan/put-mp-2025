@@ -1,4 +1,5 @@
 import json
+import math
 from pathlib import Path
 
 import torch
@@ -28,6 +29,8 @@ def get_optimal_batch_size(name: str, train_ds: DepthDataset, val_ds: DepthDatas
     batch_size = 0
 
     device = torch.device("cuda")
+
+    first_run = True
 
     while True:
         batch_size += 16
@@ -80,10 +83,15 @@ def get_optimal_batch_size(name: str, train_ds: DepthDataset, val_ds: DepthDatas
         gc.collect()
         torch.cuda.empty_cache()
 
+        if first_run:
+            batch_size *= math.ceil(total / free)
+            first_run = False
+            continue
+
         if free < 0:
-            # batch_size -= 16
-            # if batch_size < 0:
-            #     batch_size = 16
+            batch_size -= 16
+            if batch_size < 0:
+                batch_size = 16
 
             break
 
