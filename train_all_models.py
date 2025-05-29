@@ -195,11 +195,13 @@ def main():
         root_dir=env.dataset_path / "train",
         transform=transform,
         target_transform=target_transform,
+        limit_cameras=not env.both_cameras
     )
     val_dataset = DepthDataset(
         root_dir=env.dataset_path / "val",
         transform=transform,
         target_transform=target_transform,
+        limit_cameras=not env.both_cameras
     )
 
     for model in models:
