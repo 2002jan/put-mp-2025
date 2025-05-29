@@ -84,7 +84,8 @@ def get_optimal_batch_size(name: str, train_ds: DepthDataset, val_ds: DepthDatas
         torch.cuda.empty_cache()
 
         if first_run:
-            batch_size *= math.ceil(total / free)
+            batch_size *= math.ceil(total / (total - free))
+            batch_size = int(batch_size)
             first_run = False
             continue
 
