@@ -20,7 +20,7 @@ class DepthDataset(Dataset):
 
         path_pattern = str(self.root_dir / "*" / "*" / "target" / "*.png") if not limit_cameras else str(self.root_dir / "*" / "image_02" / "target" / "*.png")
 
-        for target_path in glob.glob():
+        for target_path in glob.glob(path_pattern):
             target_path = Path(target_path)
 
             parts = target_path.parts
