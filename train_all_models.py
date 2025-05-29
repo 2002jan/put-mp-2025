@@ -87,7 +87,9 @@ def get_optimal_batch_size(name: str, train_ds: DepthDataset, val_ds: DepthDatas
             batch_size *= math.ceil(total / (total - free))
             batch_size = int(batch_size)
             first_run = False
-            continue
+
+        if not first_run:
+            break
 
         if free < 0:
             batch_size -= 16
