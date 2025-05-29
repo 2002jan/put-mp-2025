@@ -83,13 +83,13 @@ def get_optimal_batch_size(name: str, train_ds: DepthDataset, val_ds: DepthDatas
         gc.collect()
         torch.cuda.empty_cache()
 
+        if not first_run:
+            break
+
         if first_run:
             batch_size *= math.ceil(total / (total - free))
             batch_size = int(batch_size)
             first_run = False
-
-        if not first_run:
-            break
 
         if free < 0:
             batch_size -= 16
@@ -113,7 +113,7 @@ def train_model(name: str, env: Env, train_ds: DepthDataset, val_ds: DepthDatase
     model.to(device)
 
     optimizer = optim.Adam(model.parameters(), lr=1e-3)
-    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=9, verbose=True)
+    scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=9)
 
     loss_fn = SILogLoss()
 
@@ -138,7 +138,7 @@ def train_model(name: str, env: Env, train_ds: DepthDataset, val_ds: DepthDatase
         train_losses.append(train_loss)
         val_losses.append(val_loss)
 
-        print(f"Train Loss: {train_loss} | Val Loss: {val_loss}")
+        print(f"Train Loss: {train_loss} | Val Loss: {val_loss} | Learning rate: {optimizer.param_groups[0]['lr']}")
 
         if best_val_loss is None or val_loss < best_val_loss:
             best_val_loss = val_loss
