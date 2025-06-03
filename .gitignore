@@ -6,4 +6,4 @@ __pycache__
 /dataset
 *.pth
 *.txt
-output/
+output*/
