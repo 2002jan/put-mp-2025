@@ -171,7 +171,7 @@ def train_model(name: str, env: Env, train_ds: DepthDataset, val_ds: DepthDatase
     model.apply(init_weights)
     model.to(device)
 
-    optimizer = optim.Adam(model.parameters(), lr=1e-3, eps=1e-8, weight_decay=1e-5)
+    optimizer = optim.Adam(model.parameters(), lr=1e-3 if "UNetAlikeDeeperCNN" not in name else 1e-4, eps=1e-8, weight_decay=1e-5)
     scheduler = ReduceLROnPlateau(optimizer, mode='min', patience=5, factor=0.5)
 
     loss_fn = SILogLoss()
