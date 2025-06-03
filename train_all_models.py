@@ -138,7 +138,7 @@ def train_model(name: str, env: Env, train_ds: DepthDataset, val_ds: DepthDatase
         train_losses.append(train_loss)
         val_losses.append(val_loss)
 
-        print(f"Train Loss: {train_loss} | Val Loss: {val_loss} | Learning rate: {optimizer.param_groups[0]['lr']} | Epochs till early stopping {epoch - best_val_epoch + 30}")
+        print(f"Train Loss: {train_loss} | Val Loss: {val_loss} | Learning rate: {optimizer.param_groups[0]['lr']} | Epochs till early stopping {30 - (epoch - best_val_epoch)}")
 
         if best_val_loss is None or val_loss < best_val_loss:
             best_val_loss = val_loss
