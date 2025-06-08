@@ -1,3 +1,9 @@
 .env
+.vscode
 /data
 .idea
+__pycache__
+/dataset
+*.pth
+*.txt
+output*/

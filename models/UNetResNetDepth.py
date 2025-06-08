@@ -2,16 +2,17 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 
+
 class UNetResNetDepth(nn.Module):
     def __init__(self):
         super(UNetResNetDepth, self).__init__()
         resnet = models.resnet34(pretrained=True)
         # Encoder layers
-        self.enc1 = nn.Sequential(resnet.conv1, resnet.bn1, resnet.relu)   
-        self.enc2 = nn.Sequential(resnet.maxpool, resnet.layer1)           
-        self.enc3 = resnet.layer2                                          
-        self.enc4 = resnet.layer3                                          
-        self.enc5 = resnet.layer4                                          
+        self.enc1 = nn.Sequential(resnet.conv1, resnet.bn1, resnet.relu)
+        self.enc2 = nn.Sequential(resnet.maxpool, resnet.layer1)
+        self.enc3 = resnet.layer2
+        self.enc4 = resnet.layer3
+        self.enc5 = resnet.layer4
 
         # Decoder layers
         self.upconv4 = self._upsample(512, 256)
@@ -26,7 +27,10 @@ class UNetResNetDepth(nn.Module):
         self.upconv1 = self._upsample(64, 32)
         self.iconv1 = self._conv_block(96, 32)
 
-        self.outconv = nn.Conv2d(32, 1, kernel_size=1)
+        self.outconv = nn.Sequential(
+            nn.Conv2d(32, 1, kernel_size=1),
+            nn.Softplus()
+        )
 
     def _upsample(self, in_ch, out_ch):
         return nn.ConvTranspose2d(in_ch, out_ch, kernel_size=2, stride=2)

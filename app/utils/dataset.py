@@ -3,13 +3,14 @@ import multiprocessing
 from pathlib import Path
 
 import numpy as np
+import torch
 from PIL import Image
 from torch.utils.data import Dataset, DistributedSampler, RandomSampler, SequentialSampler, DataLoader
 from torchvision import transforms
 
 
 class DepthDataset(Dataset):
-    def __init__(self, root_dir, transform=None, target_transform=None):
+    def __init__(self, root_dir, transform=None, target_transform=None, limit_cameras=False):
         self.root_dir = Path(root_dir)
         self.transform = transform
         self.target_transform = target_transform
@@ -17,7 +18,9 @@ class DepthDataset(Dataset):
         self.target_paths = []
         self.raw_paths = []
 
-        for target_path in glob.glob(str(self.root_dir / "*" / "*" / "target" / "*.png")):
+        path_pattern = str(self.root_dir / "*" / "*" / "target" / "*.png") if not limit_cameras else str(self.root_dir / "*" / "image_02" / "target" / "*.png")
+
+        for target_path in glob.glob(path_pattern):
             target_path = Path(target_path)
 
             parts = target_path.parts

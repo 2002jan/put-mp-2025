@@ -21,6 +21,7 @@ class DepthEstimationNet(nn.Module):
             nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1),
             nn.ReLU(inplace=True),
             nn.Conv2d(32, 1, kernel_size=1),  # Output single-channel depth map
+            nn.Softplus()
         )
 
     def forward(self, x):
